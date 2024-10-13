@@ -4,5 +4,9 @@ http://www.telerik.com/docs/default-source/fiddler/addons/fiddlercertmaker.exe?s
 
 https://huskydg.github.io/magisk-files/
 
-
+charles proxy
+https://www.charlesproxy.com/latest-release/download.do
+charles:
+	Registered Name:  https://zhile.io
+	License Key:      48891cf209c6d32bf4
 
