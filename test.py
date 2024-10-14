@@ -34,9 +34,35 @@ while True:
     time.sleep(2)
     pytesseract.pytesseract.tesseract_cmd = r'c:\leo\Tesseract-OCR\tesseract.exe'
     img = cv2.imread('num.png')
+
+
+    # TODO 去除特定背景色
+
+
+    # 将图像转换为灰度图
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    _, thresh = cv2.threshold(img, 150, 100, cv2.THRESH_BINARY)
+
+    # 使用高斯滤波去除噪声
+    img = cv2.GaussianBlur(img, (5, 5), 0)
+
+    # 应用自适应直方图均衡化 (CLAHE) 提高对比度
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    img = clahe.apply(img)
+
+    # 应用Otsu二值化，将图像转换为黑白图
+    _, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    # 将图像转换为HSV颜色空间（便于颜色过滤）
+    #img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    # 转换为灰度图像
+    #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # 使用二值化处理（可选，用于进一步清晰化前景）
+    #_, thresh = cv2.threshold(img, 150, 255, cv2.THRESH_BINARY)
+
+    # 使用 Tesseract 进行 OCR 识别
     result = pytesseract.image_to_string(thresh, config='--psm 6').split('?')
+    print(result)
+
     try:
         result[0] = result[0].strip()
         result[1] = result[1].strip()
