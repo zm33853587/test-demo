@@ -3,14 +3,33 @@ import sys
 import time
 import keyboard
 from PIL import ImageGrab
+import pygetwindow as gw
 import pyautogui
 import cv2
 import pytesseract
+
+# 获取当前鼠标位置
+print(pyautogui.position())
+# 获取当前屏幕的分辨率
+print(pyautogui.size())
+
+def getWindowPos(title):
+    # 获取所有打开的窗口
+    windows = gw.getAllTitles()
+    # 遍历窗口，查找特定标题的窗口
+    for winTitle in windows:
+        if winTitle == title:
+            # 找到窗口后，获取窗口对象
+            win = gw.getWindowsWithTitle(title)[0]
+            return (win.left, win.top, win.width, win.height)
+    else:
+        return None  # 如果没有找到窗口，返回 None
 
 while True:
     if keyboard.is_pressed('space'):
         print('游戏结束!')
         sys.exit()
+    # pos = getWindowPos("逍遥模拟器")
     ImageGrab.grab(bbox=(300, 300, 450, 450)).save('num.png')
     time.sleep(300)
     pytesseract.pytesseract,tesseract_cmd = r'c:\leo\Tesseract-OCR\tesseract.exe'
