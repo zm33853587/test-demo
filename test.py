@@ -3,10 +3,16 @@ import sys
 import time
 import keyboard
 from PIL import ImageGrab
+from PIL import Image
 import pygetwindow as gw
 import pyautogui
 import cv2
 import pytesseract
+
+
+
+
+pytesseract.pytesseract.tesseract_cmd = r'c:\leo\Tesseract-OCR\tesseract.exe'
 
 # 获取当前鼠标位置
 print(pyautogui.position())
@@ -25,32 +31,60 @@ def getWindowPos(title):
     else:
         return None  # 如果没有找到窗口，返回 None
 
+def saveBak(path, img):
+    cv2.imwrite(path, img)
+
 while True:
+    filename = 'num'
+    fileext = '.png'
     if keyboard.is_pressed('space'):
-        print('游戏结束!')
+        print('start !')
         sys.exit()
     pos = getWindowPos("逍遥模拟器")
-    ImageGrab.grab(bbox=(pos[0] + 150, pos[1] + 200, pos[0] + 400, pos[1] + 280)).save('num.png')
+    # region = (84, 336, 411, 55)
+    # pyautogui.screenshot(region=region)
+    ImageGrab.grab(bbox=(pos[0] + 150, pos[1] + 200, pos[0] + 400, pos[1] + 280)).save(filename + fileext)
     time.sleep(2)
-    pytesseract.pytesseract.tesseract_cmd = r'c:\leo\Tesseract-OCR\tesseract.exe'
-    img = cv2.imread('num.png')
 
+    # 打开图像
+    tmpImage = Image.open(filename + fileext)
+
+    # 获取图像尺寸
+    imgWidth, imgHeight = tmpImage.size
+    print(f"Image size: {imgWidth}x{imgHeight}")
+
+    # 指定要获取颜色的像素坐标
+    x, y = 50, 150  # 这是你要查询的图像坐标点
+    # 获取指定位置的像素值
+    pixel_value = tmpImage.getpixel((x, y))
+    print(pixel_value)
+
+    # 关闭图像文件
+    tmpImage.close()
+
+    # opencv 加载图像
+    img = cv2.imread(filename + fileext)
 
     # TODO 去除特定背景色
-
+    # 获取指定位置的像素值
 
     # 将图像转换为灰度图
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    saveBak(filename + '-gray' + fileext, img)
 
     # 使用高斯滤波去除噪声
     img = cv2.GaussianBlur(img, (5, 5), 0)
+    saveBak(filename + '-gb' + fileext, img)
 
     # 应用自适应直方图均衡化 (CLAHE) 提高对比度
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
     img = clahe.apply(img)
+    saveBak(filename + '-clahe' + fileext, img)
 
     # 应用Otsu二值化，将图像转换为黑白图
     _, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    saveBak(filename + '-thresh' + fileext, img)
 
     # 将图像转换为HSV颜色空间（便于颜色过滤）
     #img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -88,5 +122,7 @@ while True:
             print(f'{num1} < {num2}')
     except IndexError as e:
         print('未捕获到内容!')
+        print(e)
     except ValueError as e:
         print('未捕获到内容!')
+        print(e)
