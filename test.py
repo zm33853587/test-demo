@@ -16,7 +16,7 @@ while True:
     pytesseract.pytesseract,tesseract_cmd = r'c:\leo\Tesseract-OCR\tesseract.exe'
     img = cv2.imread('num.png')
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    _, thresh = cv.threshold(img, thresh: 150, maxval:100, cV2.THRESH_BINARY)
+    _, thresh = cv2.threshold(img, 150, 100, cv2.THRESH_BINARY)
     result = pytesseract.image_to_string(thresh, config='--psm 6').split('?')
     try:
         result[0] = result[0].strip()
