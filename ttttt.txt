@@ -10,3 +10,66 @@ charles: https://www.cnblogs.com/fuminer/p/17300854.html
 	Registered Name:  https://zhile.io
 	License Key:      48891cf209c6d32bf4
 https://github.com/Magisk-Modules-Repo/movecert/tags
+
+一、安装Andriod模拟器（Memu、Mumu等）
+	注意设置：【分辨率、磁盘可写、ROOT权限、ADB调试（开启本地连接）、开启开发者选项 & USB调试】
+二、安装ADB（Android Debug Bridge）：连接器，命令行工具，用于连接和管理Android设备或模拟器。
+	1、解压platform-tools-latest-windows.zip：
+	2、将platform-tools目录添加到系统环境变量
+三、安装Python环境：3.x+
+	1、安装Python环境：
+	2、安装依赖（pip install -r requirements.txt）
+		pip install -r requirements.txt
+	3、添加Python环境变量
+
+四、抓包工具
+	pip install mitmproxy
+	
+
+
+九、附录
+	1、配置独立的python虚拟环境【venv：3.3+标准库】【virtualenv：第三方库】
+		创建虚拟环境
+			（1）方式一（标准库）：
+				python -m venv /path/to/new/virtual/environment
+			（1）方式二（第三方库）：需要先安装（pip insta11 virtualenv）
+				# virtualenv /path/to/new/virtual/myenv
+				virtualenv myenv
+		激活虚拟环境
+			#/path/to/new/virtual/environment/Scripts/activate
+			myenv/Scripts/activate
+		离开虚拟环境
+			deactivate
+		删除虚拟环境
+			虚拟环境是一个独立的文件夹，删除它不会对系统造成任何影响。
+		
+		virtualenvwrapper：virtualenv的扩展工具
+			pip install virtualenvwrapper
+	2、jupyter
+	3、opencv：图形预处理库，python不需要再额外安装opencv2软件
+		# opencv 核心包
+		pip insta11 opencv-python==3.4.1.15
+		# opencv 扩展包(选装)
+		pip insta11 opencv-contrib-python==3.4.1.15
+	4、ocr识别：pytesseract：仍然需要额外安装tesseract软件 + 配置环境变量
+		pip search pytesseract
+		pip install pytesseract==0.3.10
+	5、自动化脚本：appium、autojs、pyautogui
+	7、截图：PIL
+		
+		
+	7、LSPosed 是一个基于Riru 的ART hook 框架(最初用于Android Pie) ，提供与原版Xposed 相同的API, 使用YAHFA (或SandHook) 进行hook, 支持Android 8.0 ~ 11。
+	8、Kitsune Mask是一款专业的手机root系统辅助工具app。很多用户拿到手机后会选择root化，之后可以根据自己的需求自定义模块，让手机操作更加符合实际需求。
+	实际上，root操作对于一些新手来说可能比较复杂，但是现在有很多软件可以提供帮助，这对于很多不知道如何操作的用户来说非常不错。
+	这款软件可以帮助实现完美的手机root化，让手机拥有更多可能性，能够有效防止和通过root检测，它的root隐藏功能更强，具备magisk hide隐藏功能。
+	用户可以通过刷入已修补的boot文件来获得Root权限，从而优化和改进手机的使用体验。如果您对德尔塔面具感兴趣，一定不要错过这款软件！
+	9、TrustMeAlready
+	10、IDE工具：VSCode、PyCharm
+		
+其他：
+
+
+方案一、截图 > ocr > pyautogui
+方案二、抓包 > 
+	
+
