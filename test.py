@@ -7,6 +7,7 @@ from PIL import Image
 import pygetwindow as gw
 import pyautogui
 import cv2
+import numpy as np
 import pytesseract
 
 
@@ -56,17 +57,32 @@ while True:
     # 指定要获取颜色的像素坐标
     x, y = 50, 150  # 这是你要查询的图像坐标点
     # 获取指定位置的像素值
-    pixel_value = tmpImage.getpixel((x, y))
-    print(pixel_value)
+    bgColor = tmpImage.getpixel((x, y))
+    print(bgColor)
 
     # 关闭图像文件
     tmpImage.close()
 
     # opencv 加载图像
-    img = cv2.imread(filename + fileext)
+    image = cv2.imread(filename + fileext)
 
     # TODO 去除特定背景色
-    # 获取指定位置的像素值
+    # 将图像转换为HSV颜色空间（便于颜色过滤）
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    # 定义要去除的背景颜色范围（例如，蓝色背景）
+    lower_color = np.array([bgColor[0] - 10, bgColor[1] - 10, bgColor[2] - 10])
+    upper_color = np.array([bgColor[0] + 10, bgColor[1] + 10, bgColor[2] + 10])
+
+    # 创建掩码，去除指定颜色范围内的背景
+    mask = cv2.inRange(hsv_image, lower_color, upper_color)
+
+    # 反转掩码，保留前景
+    mask_inv = cv2.bitwise_not(mask)
+
+    # 保留图像中的前景
+    foreground = cv2.bitwise_and(image, image, mask=mask_inv)
+    saveBak(filename + '-clear' + fileext, img)
 
     # 将图像转换为灰度图
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
