@@ -29,10 +29,10 @@ while True:
     if keyboard.is_pressed('space'):
         print('游戏结束!')
         sys.exit()
-    # pos = getWindowPos("逍遥模拟器")
-    ImageGrab.grab(bbox=(300, 300, 450, 450)).save('num.png')
-    time.sleep(300)
-    pytesseract.pytesseract,tesseract_cmd = r'c:\leo\Tesseract-OCR\tesseract.exe'
+    pos = getWindowPos("逍遥模拟器")
+    ImageGrab.grab(bbox=(pos[0] + 150, pos[1] + 200, pos[0] + 400, pos[1] + 280)).save('num.png')
+    time.sleep(2)
+    pytesseract.pytesseract.tesseract_cmd = r'c:\leo\Tesseract-OCR\tesseract.exe'
     img = cv2.imread('num.png')
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     _, thresh = cv2.threshold(img, 150, 100, cv2.THRESH_BINARY)
@@ -46,7 +46,8 @@ while True:
             result[1]=0
         num1 = math.floor(float(result[0]))
         num2 = math.floor(float(result[1]))
-        pyautogui.moveTo(277, 700, duration=0.1)
+        # pyautogui.moveTo(277, 700, duration=0.1)
+        pyautogui.moveTo(pos[0] + pos[2]/2, pos[1] + 500, duration=0.1)
         if num1 > num2:
             pyautogui.mouseDown()
             pyautogui.move(100,100, duration=0.1)
