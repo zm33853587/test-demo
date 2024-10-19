@@ -72,4 +72,4 @@ https://github.com/Magisk-Modules-Repo/movecert/tags
 方案一、截图 > ocr > pyautogui
 方案二、抓包 > 
 	
-
+https://dl.twrp.me/x1s/twrp-3.7.0_11-0-x1s.img.html
