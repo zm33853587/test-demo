@@ -1,0 +1,414 @@
+{
+  "log": {
+    "level": "info",
+    "timestamp": true
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "proxy-dns",
+        "address": "https://cloudflare-dns.com/dns-query",
+        "address_resolver": "default-dns",
+        "detour": "proxy-out"
+      },
+      {
+        "tag": "fakeip-dns",
+        "address": "fakeip"
+      },
+      {
+        "tag": "direct-dns",
+        "address": "https://dns.alidns.com/dns-query",
+        "address_resolver": "default-dns",
+        "detour": "direct-out"
+      },
+      {
+        "tag": "default-dns",
+        "address": "https://223.5.5.5/dns-query",
+        "detour": "direct-out"
+      },
+      {
+        "tag": "block-dns",
+        "address": "rcode://refused"
+      }
+    ],
+    "rules": [
+      {
+        "outbound": "any",
+        "server": "default-dns"
+      },
+      {
+        "clash_mode": "Global",
+        "server": "fakeip-dns",
+        "rewrite_ttl": 1
+      },
+      {
+        "clash_mode": "Direct",
+        "server": "direct-dns"
+      },
+      {
+        "rule_set": [
+          "geosite-proxy-3rd",
+          "geosite-proxy-custom"
+        ],
+        "server": "fakeip-dns",
+        "rewrite_ttl": 1
+      },
+      {
+        "rule_set": [
+          "geosite-cn-3rd",
+          "geosite-cn-custom"
+        ],
+        "server": "direct-dns"
+      },
+      {
+        "query_type": [
+          "A",
+          "AAAA"
+        ],
+        "server": "fakeip-dns",
+        "rewrite_ttl": 1
+      }
+    ],
+    "final": "block-dns",
+    "fakeip": {
+      "enabled": true,
+      "inet4_range": "198.18.0.0/15",
+      "inet6_range": "fc00::/18"
+    },
+    "strategy": "ipv4_only",
+    "independent_cache": true
+  },
+  "inbounds": [
+    {
+      "type": "tun",
+      "tag": "tun-in",
+      "interface_name": "boxtun0",
+      "mtu": 1500,
+      "address": [
+        "172.19.0.1/30",
+        "fdfe:dcba:6789::1/126"
+      ],
+      "auto_route": true,
+      "strict_route": true,
+      "route_address": [
+        "0.0.0.0/1",
+        "128.0.0.0/1",
+        "::/1",
+        "8000::/1"
+      ],
+      "stack": "mixed",
+      "platform": {
+        "http_proxy": {
+          "server": "127.0.0.1",
+          "server_port": 1080
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "vless",
+      "tag": "reality-out",
+      "server": "wine168.shop",
+      "server_port": 5443,
+      "uuid": "2d6ae072-8173-4eb6-9cf2-2cd15203ff03",
+      "flow": "xtls-rprx-vision",
+      "tls": {
+        "enabled": true,
+        "server_name": "itunes.apple.com",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "reality": {
+          "enabled": true,
+          "public_key": "w9FbPgHhqt88s3iqbb5Aik71dm4IOKK2vbcGUpVYyDs",
+          "short_id": "2cb6a50ee7f00ab5"
+        }
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "hysteria2",
+      "tag": "hysteria2-out",
+      "server": "wine168.shop",
+      "server_port": 6443,
+      "up_mbps": 100,
+      "down_mbps": 100,
+      "obfs": {
+        "type": "salamander",
+        "password": "b7460a6ff21b64ff"
+      },
+      "password": "ff2074aaf6f037a0",
+      "tls": {
+        "enabled": true,
+        "server_name": "bing.com",
+        "insecure": true,
+        "alpn": "h3"
+      }
+    },
+    {
+      "type": "vmess",
+      "tag": "vmess-ws-out",
+      "server": "v.abc1618.xyz",
+      "server_port": 443,
+      "uuid": "1f8a0bd2-5fce-49ab-ac75-922365fd92ff",
+      "security": "auto",
+      "tls": {
+        "enabled": true,
+        "server_name": "v.abc1618.xyz",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/im/msg",
+        "headers": {
+          "Host": "v.abc1618.xyz"
+        }
+      }
+    },
+    {
+      "type": "urltest",
+      "tag": "urltest-out",
+      "outbounds": [
+        "reality-out",
+        "hysteria2-out",
+        "vmess-ws-out"
+      ],
+      "interrupt_exist_connections": true
+    },
+    {
+      "type": "selector",
+      "tag": "proxy-out",
+      "outbounds": [
+        "urltest-out",
+        "reality-out",
+        "hysteria2-out",
+        "vmess-ws-out"
+      ],
+      "default": "urltest-out",
+      "interrupt_exist_connections": true
+    },
+    {
+      "type": "selector",
+      "tag": "download-out",
+      "outbounds": [
+        "hysteria2-out",
+        "vmess-ws-out"
+      ],
+      "default": "vmess-ws-out",
+      "interrupt_exist_connections": true
+    },
+    {
+      "type": "dns",
+      "tag": "dns-out"
+    },
+    {
+      "type": "direct",
+      "tag": "direct-out"
+    },
+    {
+      "type": "block",
+      "tag": "block-out"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+          {
+            "protocol": "dns"
+          },
+          {
+            "port": 53
+          }
+        ],
+        "outbound": "dns-out"
+      },
+      {
+        "ip_version": 6,
+        "outbound": "block-out"
+      },
+      {
+        "clash_mode": "Global",
+        "outbound": "proxy-out"
+      },
+      {
+        "clash_mode": "Direct",
+        "outbound": "direct-out"
+      },
+      {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+          {
+            "port": 853
+          },
+          {
+            "network": "udp",
+            "port": 443
+          },
+          {
+            "protocol": "stun"
+          }
+        ],
+        "outbound": "block-out"
+      },
+      {
+        "rule_set": "geo-lan",
+        "outbound": "direct-out"
+      },
+      {
+        "rule_set": "geoip-block",
+        "outbound": "block-out"
+      },
+      {
+        "rule_set": "geosite-block",
+        "outbound": "block-out"
+      },
+      {
+        "domain_suffix": [
+          "gjrvpf.com",
+"642p.com",
+          "others.urls"
+        ],
+        "ip_cidr": "157.7.44.239/32",
+        "outbound": "proxy-out"
+      },
+      {
+        "rule_set": [
+          "geoip-proxy-3rd",
+          "geoip-proxy-custom"
+        ],
+        "outbound": "proxy-out"
+      },
+      {
+        "rule_set": [
+          "geosite-proxy-3rd",
+          "geosite-proxy-custom"
+        ],
+        "outbound": "proxy-out"
+      },
+      {
+        "rule_set": [
+          "geoip-cn-3rd",
+          "geoip-cn-custom"
+        ],
+        "outbound": "direct-out"
+      },
+      {
+        "rule_set": [
+          "geosite-cn-3rd",
+          "geosite-cn-custom"
+        ],
+        "outbound": "direct-out"
+      }
+    ],
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "geoip-block",
+        "format": "source",
+        "url": "https://raw.githubusercontent.com/zm33853587/share-files/master/sbox/rules/geoip-block.json",
+        "download_detour": "download-out",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": "geoip-cn-3rd",
+        "format": "source",
+        "url": "https://raw.githubusercontent.com/zm33853587/share-files/master/sbox/rules/geoip-cn-3rd.json",
+        "download_detour": "download-out",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": "geoip-cn-custom",
+        "format": "source",
+        "url": "https://raw.githubusercontent.com/zm33853587/share-files/master/sbox/rules/geoip-cn-custom.json",
+        "download_detour": "download-out",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": "geoip-proxy-3rd",
+        "format": "source",
+        "url": "https://raw.githubusercontent.com/zm33853587/share-files/master/sbox/rules/geoip-proxy-3rd.json",
+        "download_detour": "download-out",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": "geoip-proxy-custom",
+        "format": "source",
+        "url": "https://raw.githubusercontent.com/zm33853587/share-files/master/sbox/rules/geoip-proxy-custom.json",
+        "download_detour": "download-out",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": "geosite-block",
+        "format": "source",
+        "url": "https://raw.githubusercontent.com/zm33853587/share-files/master/sbox/rules/geosite-block.json",
+        "download_detour": "download-out",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": "geosite-cn-3rd",
+        "format": "source",
+        "url": "https://raw.githubusercontent.com/zm33853587/share-files/master/sbox/rules/geosite-cn-3rd.json",
+        "download_detour": "download-out",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": "geosite-cn-custom",
+        "format": "source",
+        "url": "https://raw.githubusercontent.com/zm33853587/share-files/master/sbox/rules/geosite-cn-custom.json",
+        "download_detour": "download-out",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": "geosite-proxy-3rd",
+        "format": "source",
+        "url": "https://raw.githubusercontent.com/zm33853587/share-files/master/sbox/rules/geosite-proxy-3rd.json",
+        "download_detour": "download-out",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": "geosite-proxy-custom",
+        "format": "source",
+        "url": "https://raw.githubusercontent.com/zm33853587/share-files/master/sbox/rules/geosite-proxy-custom.json",
+        "download_detour": "download-out",
+        "update_interval": "24h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": "geo-lan",
+        "format": "source",
+        "url": "https://raw.githubusercontent.com/zm33853587/share-files/master/sbox/rules/geo-lan.json",
+        "download_detour": "download-out",
+        "update_interval": "24h0m0s"
+      }
+    ],
+    "final": "block-out",
+    "auto_detect_interface": true
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true
+    },
+    "clash_api": {
+      "default_mode": "Rule"
+    }
+  }
+}
